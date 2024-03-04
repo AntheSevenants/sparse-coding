@@ -1,3 +1,3 @@
-FROM anthesevenants/sparsecoding
+FROM sparse-coding
 
 ENTRYPOINT [ "./nonneg.o" ]

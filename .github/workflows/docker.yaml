@@ -1,0 +1,72 @@
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+
+  release:
+    types:
+      - "created"
+      - "edited"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: PrepareReg Names
+        run: |
+          echo OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ env.OWNER }}/sparse-coding
+            ghcr.io/${{ env.OWNER }}/sparse-coding:latest
+            ghcr.io/${{ env.OWNER }}/sparse-coding:nonneg
+          tags: |
+            type=ref,event=pr
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker
+      - name: Login to ghcr.io
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ github.token }}
+      - name: Build base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          load: true
+          tags: |
+            sparse-coding
+      - name: Build and push base image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          tags: |
+            ghcr.io/${{ env.OWNER }}/sparse-coding
+          push: ${{ github.event_name != 'pull_request' }}
+      - name: Build non-negative image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile_nonneg
+          build-contexts: |
+            sparse-coding=docker-image://sparse-coding            
+          tags: ghcr.io/${{ env.OWNER }}/sparse-coding:nonneg
+          push: ${{ github.event_name != 'pull_request' }}
