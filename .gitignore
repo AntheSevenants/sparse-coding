@@ -1,0 +1,3 @@
+*.o
+*.txt
+!sample_vecs.txt
