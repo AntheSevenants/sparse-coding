@@ -1,5 +1,7 @@
 # Sparse Coding
-Manaal Faruqui, manaalfar@gmail.com
+
+Manaal Faruqui, manaalfar@gmail.com  
+Docker implementation by Anthe Sevenants
 
 This tool implements sparse coding for converting dense word vector representations to highly sparse vectors. The implementation can be run on multiple cores in parallel with asynchronous updates. The sparsity is introduced in the word vectors using L1 regularization. For technical details please refer to Faruqui et al (2015).
 
@@ -33,6 +35,27 @@ Usage: ```./sparse.o vec_corpus factor l1_reg l2_reg num_cores outfilename```
 Example: ```./sparse.o sample_vecs.txt 10 0.5 1e-5 1 out_vecs.txt```
 
 This example would expand the vectors in sample_vecs.txt to 10 times their original length.
+
+### Running the executable with Docker
+
+I (Anthe Sevenants) compiled the program for use in Docker. You can use it as follows:
+
+```
+docker run \
+-v "./sample_vecs.txt:/sparse/my_vectors.txt" \
+-v "./output.txt:/sparse/output.txt" \
+"ghcr.io/anthesevenants/sparse-coding" \
+my_vectors.txt 10 0.5 1e-5 1 output.txt
+```
+
+The arguments remain the same.
+
+**Two important points**:
+
+1. Make sure your volume mappings and arguments correspond (e.g. /sparse/my_vectors.txt in the volume mapping and my_vectors.txt in the arguments - the same applies for output.txt)
+2. Make sure to create your output text file before running the command. If the file does not yet exist, Docker will make a directory for it (and output will fail!). The file can be empty, but it must exist.
+
+You can use the non-negative version of this program by using the `ghcr.io/anthesevenants/sparse-coding:nonneg` image.
 
 ### Reference
 
