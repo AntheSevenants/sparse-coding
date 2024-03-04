@@ -1,0 +1,3 @@
+FROM anthesevenants/sparsecoding
+
+ENTRYPOINT [ "./nonneg.o" ]
