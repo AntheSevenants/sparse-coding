@@ -1,5 +1,5 @@
 CC = g++
-INCLUDES = -I /opt/tools/eigen-eigen-ffa86ffb5570 
+INCLUDES = -I /opt/tools/eigen 
 CFLAGS = -std=c++11 -O3 -ffast-math
 LIBS = -fopenmp
 SRCS = sparse.cc utils.cc
